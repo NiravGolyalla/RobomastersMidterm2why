@@ -4,11 +4,16 @@ import numpy as np
 import pandas
 
 class Model:
-    def __init__(self, model_type = "custom", weights = "best.pt", repo_name = "ultralytics/yolov5") :
+    def __init__(self, model_type = "custom", weights = "best.pt", repo_name = "ultralytics/yolov5", width, height) :
         self.model_type = model_type
         self.weight_path = weights
         self.repo_name = repo_name
         self.model = torch.hub.load(repo_name,model_type,path=weights)
+        self.width = width
+        self.height = height
+        
+        self.center_x = width/2
+        self.center_y = height/2
 
     def detectFrame(self, frame):
         plates = self.model(frame)
@@ -31,11 +36,24 @@ class Model:
             average = cv2.mean(mask)[0]
             if average == 0:
                 continue
+
+            x_offset,y_offset = calculate_offset(self, x,y)
     
             bbox = [x_min, y_min, x_max, y_max, conf, label]
             bboxes.append(bbox)
 
             print("Object {} detected at ({},{}) \n\n\n ({},{})".format(i, x_min, y_min, x_max, y_max))
-        return bboxes
+        return bboxes,x_offset,y_offset
 
+    def calculate_offset(self, x,y):
+        yspecial = self.width - y
+        move_x = x - self.center_x
+        move_y = yspecial - self.center_y
+        if(move_x != 0):
+            move_x /= self.center_x
+        if(move_y != 0):
+            move_y /= self.center_y
         
+        return move_x, move_y
+
+            

@@ -8,8 +8,7 @@ class Camera:
         else:
             self.feed = cv2.VideoCapture(path)
             self.depth = False
-
-
+        
 
     def release(self):
         self.feed.release()
@@ -29,3 +28,4 @@ class Camera:
             cv2.putText(frame, label_conf, (int(bbox[0]), int(bbox[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2, cv2.LINE_AA)
  
         cv2.imshow("Frame",frame)
+
