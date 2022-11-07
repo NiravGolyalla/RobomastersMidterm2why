@@ -21,6 +21,7 @@ class Camera:
             cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2) 
             if(self.depth):
                 depth = ""
+                #call camera command to get depth at pixel idk how
             else:
                 depth = ""
             

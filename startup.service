@@ -6,9 +6,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 Restart=always
-RestartSec=2
 User=nirav
-ExecStartPre=conda activate cv_detection
 ExecStart=python main.py
 
 [Install]

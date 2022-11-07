@@ -4,7 +4,7 @@ import numpy as np
 import pandas
 
 class Model:
-    def __init__(self, model_type = "custom", weights = "best.pt", repo_name = "ultralytics/yolov5", width, height) :
+    def __init__(self, model_type = "custom", weights = "best.pt", repo_name = "ultralytics/yolov5",width=640, height=360) :
         self.model_type = model_type
         self.weight_path = weights
         self.repo_name = repo_name
@@ -15,6 +15,18 @@ class Model:
         self.center_x = width/2
         self.center_y = height/2
 
+    def calculate_offset(self, x,y):
+        yspecial = self.width - y
+        move_x = x - self.center_x
+        move_y = yspecial - self.center_y
+        if(move_x != 0):
+            move_x /= self.center_x
+        if(move_y != 0):
+            move_y /= self.center_y
+        print("sus")
+        return move_x, move_y
+
+
     def detectFrame(self, frame):
         plates = self.model(frame)
 
@@ -23,7 +35,7 @@ class Model:
         for i in range(len(detections_rows)):
             rows = detections_rows[i].to_numpy()
         bboxes = []
-
+        offsets = []
         for i in range(len(rows)):
             x_min, y_min, x_max, y_max, conf, cls, label = rows[i]
 
@@ -37,23 +49,13 @@ class Model:
             if average == 0:
                 continue
 
-            x_offset,y_offset = calculate_offset(self, x,y)
-    
+            x_offset,y_offset = self.calculate_offset(x_min,y_min)
+            offsets.append((x_offset,y_offset))
             bbox = [x_min, y_min, x_max, y_max, conf, label]
             bboxes.append(bbox)
 
             print("Object {} detected at ({},{}) \n\n\n ({},{})".format(i, x_min, y_min, x_max, y_max))
-        return bboxes,x_offset,y_offset
+        return bboxes,offsets
 
-    def calculate_offset(self, x,y):
-        yspecial = self.width - y
-        move_x = x - self.center_x
-        move_y = yspecial - self.center_y
-        if(move_x != 0):
-            move_x /= self.center_x
-        if(move_y != 0):
-            move_y /= self.center_y
-        
-        return move_x, move_y
-
+    
             
